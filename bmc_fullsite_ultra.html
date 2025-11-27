@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Business Mobility Coach — Demo Ultra-Pro</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{
+      --bg:#071426; --card:#0b1724; --accent1:#1db954; --accent2:#3ec1ff; --muted:#9aa7b2;
+      --glass: rgba(255,255,255,0.03); --glass-border: rgba(255,255,255,0.04);
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#041226 0%, #071a2a 100%);color:#e7f0f5;}
+    .wrap{max-width:1200px;margin:28px auto;padding:20px;}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:12px;}
+    .logo{width:70px;height:70px;border-radius:14px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#032823;box-shadow:0 8px 30px rgba(3,40,35,0.25)}
+    h1{margin:0;font-size:20px;letter-spacing:0.2px}
+    p.lead{margin:4px 0 0;color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.01)); border:1px solid var(--glass-border); padding:18px;border-radius:12px;}
+    .checkin .row{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+    .option{padding:10px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;transition:all .18s}
+    .option:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(2,18,28,0.25)}
+    .option.active{background:linear-gradient(90deg, rgba(29,185,84,0.12), rgba(62,193,255,0.06)); color:#e9fff3; border-color: rgba(29,185,84,0.14);}
+    .muted{color:var(--muted);font-size:13px}
+    .actions{display:flex;gap:10px;margin-top:12px}
+    .btn{padding:10px 14px;border-radius:10px;border:0;background:var(--accent1);color:#042826;cursor:pointer;font-weight:700}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .mobility-canvas{margin-top:12px;display:flex;flex-direction:column;gap:12px}
+    .kpis{display:flex;gap:12px;flex-wrap:wrap}
+    .kpi{flex:1;min-width:170px;padding:12px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.02)}
+    .kpi .label{font-size:12px;color:var(--muted)}
+    .kpi .value{font-size:18px;font-weight:800;color:#fff;margin-top:6px}
+    .faq{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.03);}
+    .scenario{display:flex;gap:12px;align-items:flex-start;margin-top:10px;flex-wrap:wrap}
+    .box{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:rgba(255,255,255,0.015)}
+    .mini-case{padding:10px;border-radius:8px;background:rgba(255,255,255,0.01);border:1px dashed rgba(255,255,255,0.03);font-size:13px}
+    .assistant{position:fixed;right:20px;bottom:20px;width:360px;border-radius:12px;overflow:hidden;background:#071426;border:1px solid rgba(255,255,255,0.03);box-shadow:0 20px 60px rgba(2,10,18,0.7)}
+    .assistant header{display:flex;gap:12px;align-items:center;padding:12px;background:linear-gradient(90deg, rgba(29,185,84,0.06), transparent)}
+    .assistant .body{padding:12px;max-height:420px;overflow:auto}
+    .msg{padding:10px;border-radius:12px;margin-bottom:8px;display:inline-block;clear:both;max-width:85%}
+    .msg.ai{background:rgba(255,255,255,0.02);float:left;color:#e6f1f7}
+    .msg.user{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#042826;float:right}
+    .input{display:flex;padding:12px;border-top:1px solid rgba(255,255,255,0.02);gap:8px;background:rgba(0,0,0,0.02)}
+    input[type="text"]{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit}
+    .tag{font-size:12px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);display:inline-block;color:var(--muted)}
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+    /* subtle animations */
+    .fade-in {animation:fadeIn .45s ease both}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}.assistant{right:10px;left:10px;width:auto}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">BMC</div>
+      <div>
+        <h1>Business Mobility Coach — Demo (Ultra-Pro)</h1>
+        <p class="lead">Percorso predittivo e personalizzato per il Noleggio a Lungo Termine — prova la demo e condividi l'URL per testare.</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <main>
+        <section class="card checkin fade-in" id="checkin">
+          <h3>Mini Check-in</h3>
+          <div class="muted">Rispondi in 10 secondi: il sistema costruirà un Mobility Canvas su misura per la tua azienda.</div>
+
+          <div class="row">
+            <div style="min-width:120px"><div class="muted">Tipo azienda</div>
+              <div id="profileOptions" style="margin-top:8px"></div>
+            </div>
+
+            <div style="min-width:160px"><div class="muted">Priorità</div>
+              <div id="priorityOptions" style="margin-top:8px"></div>
+            </div>
+
+            <div style="min-width:120px"><div class="muted">Numero veicoli</div>
+              <div id="sizeOptions" style="margin-top:8px"></div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="generate">Genera il tuo Mobility Canvas</button>
+            <button class="btn ghost" id="reset">Reset</button>
+            <button class="btn ghost" id="demoTour">Fai un tour guidato</button>
+          </div>
+        </section>
+
+        <section class="card fade-in" id="canvasSection" style="display:none">
+          <h3>Mobility Canvas</h3>
+          <div class="muted" id="canvasIntro">Panoramica costruita per te.</div>
+
+          <div class="mobility-canvas" id="canvasContent"></div>
+
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" id="downloadJSON">Scarica riassunto (JSON)</button>
+            <button class="btn ghost" id="editChoices">Modifica scelte</button>
+            <button class="btn ghost" id="shareLink">Copia link per test</button>
+            <button class="btn" id="exportPNG">Esporta Canvas (PNG)</button>
+          </div>
+        </section>
+
+        <section class="card fade-in" id="scenarios" style="display:none">
+          <h3>Confronto rapido: Acquisto vs Noleggio</h3>
+          <div class="scenario">
+            <div class="box">
+              <strong>Scenario A — Acquisto</strong>
+              <ul>
+                <li>Costi iniziali alti</li>
+                <li>Imprevisti e manutenzione</li>
+                <li>Svalutazione</li>
+              </ul>
+            </div>
+            <div class="box">
+              <strong>Scenario B — Noleggio a Lungo Termine</strong>
+              <ul>
+                <li>Budget prevedibile</li>
+                <li>Gestione delegata</li>
+                <li>Flotta aggiornata</li>
+              </ul>
+            </div>
+          </div>
+          <canvas id="compareChart" style="max-width:100%;height:220px;margin-top:14px"></canvas>
+        </section>
+
+        <section class="card fade-in" id="cases" style="display:none">
+          <h3>Come fanno le aziende del tuo settore</h3>
+          <div id="casesList" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:8px"></div>
+        </section>
+      </main>
+
+      <aside>
+        <div class="card fade-in">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Predictive FAQ</strong><div class="muted" style="margin-top:6px">Domande che probabilmente ti stai per fare.</div></div>
+            <div class="tag" id="profileTag">—</div>
+          </div>
+          <div id="faqList" style="margin-top:12px"></div>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button class="btn ghost" id="openAll">Mostra tutte</button>
+            <button class="btn" id="contact">Contatta un esperto</button>
+          </div>
+        </div>
+
+        <div class="card fade-in" style="margin-top:12px">
+          <strong>Micro-simulazioni</strong>
+          <div class="muted" style="margin-top:8px">Scegli uno scenario</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="option" id="simBuy">Acquisto</button>
+            <button class="option" id="simRent">NLT</button>
+          </div>
+          <div id="simResult" style="margin-top:8px"></div>
+        </div>
+
+        <div class="card fade-in" style="margin-top:12px">
+          <strong>Mini case</strong>
+          <div class="mini-case" id="miniCase">Nessun settore selezionato.</div>
+        </div>
+      </aside>
+    </div>
+
+    <footer>Demo ultra-pro — carica questo file su qualsiasi hosting statico (GitHub Pages, Netlify, Vercel) e condividi l'URL.</footer>
+  </div>
+
+  <!-- Assistant -->
+  <div class="assistant" id="assistant" role="dialog" aria-label="Assistant">
+    <header>
+      <div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#042826">AI</div>
+      <div>
+        <div style="font-weight:700">Mobility Coach</div>
+        <div style="font-size:12px;color:var(--muted)">Assistente interattivo</div>
+      </div>
+    </header>
+    <div class="body" id="assistantBody">
+      <div class="msg ai">Ciao! Posso fare una simulazione rapida, spiegare la deducibilità o generare un mini-preventivo. Prova a scrivere: <em>preventivo</em>, <em>deducibilità</em>, <em>km</em>, <em>elettrico</em>.</div>
+    </div>
+    <div class="input">
+      <input id="assistantInput" type="text" placeholder="Prova: 'preventivo 5 veicoli', 'deducibilità PMI'..." />
+      <button class="btn" id="assistantSend">Invia</button>
+    </div>
+  </div>
+
+<script>
+/* Ultra-pro single-file JS
+   - Interactions, Chart.js, share link, export PNG, JSON export, assistant mock with placeholder for real AI integration.
+*/
+
+// State
+const state = { profile:null, priority:null, size:null, timestamp:null, id:null };
+
+// Options data
+const profileOptions = [
+  {key:'freelancer', label:'Libero Professionista'},
+  {key:'pmi', label:'PMI'},
+  {key:'company', label:'Azienda Strutturata'},
+  {key:'corporate', label:'Corporate'}
+];
+const priorityOptions = [
+  {key:'cost', label:'Ridurre i costi'},
+  {key:'manage', label:'Gestione semplificata'},
+  {key:'tax', label:'Fiscalità'},
+  {key:'green', label:'Sostenibilità'}
+];
+const sizeOptions = [
+  {key:'1', label:'1'},
+  {key:'2-5', label:'2–5'},
+  {key:'6-20', label:'6–20'},
+  {key:'20+', label:'20+'}
+];
+
+// init UI
+function el(html){ const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
+
+function mountOptions(){
+  const pWrap = document.getElementById('profileOptions');
+  profileOptions.forEach(o=>{
+    const btn = document.createElement('button');
+    btn.className='option'; btn.innerText = o.label; btn.dataset.value = o.key;
+    btn.addEventListener('click', ()=> selectOption(btn,'profile'));
+    pWrap.appendChild(btn);
+  });
+  const prWrap = document.getElementById('priorityOptions');
+  priorityOptions.forEach(o=>{
+    const btn = document.createElement('button');
+    btn.className='option'; btn.innerText = o.label; btn.dataset.value = o.key;
+    btn.addEventListener('click', ()=> selectOption(btn,'priority'));
+    prWrap.appendChild(btn);
+  });
+  const sWrap = document.getElementById('sizeOptions');
+  sizeOptions.forEach(o=>{
+    const btn = document.createElement('button');
+    btn.className='option'; btn.innerText = o.label; btn.dataset.value = o.key;
+    btn.addEventListener('click', ()=> selectOption(btn,'size'));
+    sWrap.appendChild(btn);
+  });
+}
+
+function selectOption(btn, type){
+  // deselect group
+  btn.parentElement.querySelectorAll('.option').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  state[type] = btn.dataset.value;
+  document.getElementById('profileTag').innerText = state.profile ? state.profile.toUpperCase() : '—';
+}
+
+// helper estimates
+function estimateSaving(){ if(state.profile==='freelancer') return 18; if(state.profile==='pmi') return 20; if(state.profile==='company') return 15; if(state.profile==='corporate') return 12; return 15; }
+function estimateMgmt(){ if(state.size==='1') return 40; if(state.size==='2-5') return 60; if(state.size==='6-20') return 75; if(state.size==='20+') return 85; return 50; }
+function estimateRisk(){ if(state.priority==='cost') return 'Basso'; if(state.priority==='manage') return 'Molto basso'; if(state.priority==='tax') return 'Basso'; if(state.priority==='green') return 'Moderato'; return 'Basso'; }
+function simulateCost(mode){ let base=6000; if(state.size==='1') base=4200; if(state.size==='2-5') base=14000; if(state.size==='6-20') base=70000; if(state.size==='20+') base=220000; if(mode==='buy') base=Math.round(base*1.25); return base; }
+
+function getPredictiveFaqs(){
+  const q=[
+    {q:'Quanto risparmio rispetto all’acquisto?', a:`Risparmio stimato tra ${estimateSaving()}% a seconda del parco e dell'utilizzo.`},
+    {q:'Come funziona la deducibilità fiscale?', a:'Le spese di noleggio sono spesso deducibili come costi d’esercizio: verifica il caso specifico con il tuo commercialista.'},
+    {q:'Cosa succede se supero i km?', a:'I contratti prevedono una tariffa chilometrica trasparente, modificabile in corso d’opera.'}
+  ];
+  if(state.priority==='manage') q.push({q:'Chi gestisce manutenzione e multe?', a:'Il fornitore NLT gestisce manutenzione, assicurazione e pratiche amministrative.'});
+  if(state.priority==='green') q.push({q:'Posso avere una fleet elettrica?', a:'Sì: progettiamo piani di elettrificazione con analisi incentivi e impatto CO₂.'});
+  if(state.profile==='freelancer') q.push({q:'Posso dedurre il veicolo come professionista?', a:'Spesso sì; dipende dall’uso. Consulta il tuo commercialista.'});
+  return q;
+}
+
+// generate canvas content
+function generateCanvas(){
+  if(!state.profile || !state.priority || !state.size){ alert('Seleziona tipo azienda, priorità e numero di veicoli'); return; }
+  state.timestamp = new Date().toISOString();
+  state.id = Math.random().toString(36).slice(2,9);
+
+  document.getElementById('checkin').style.display='none';
+  document.getElementById('canvasSection').style.display='block';
+  document.getElementById('scenarios').style.display='block';
+  document.getElementById('cases').style.display='block';
+
+  const intro = document.getElementById('canvasIntro');
+  intro.innerText = `Mobility Canvas · ${state.profile.toUpperCase()} · Priorità: ${state.priority} · Veicoli: ${state.size}`;
+
+  const content = document.getElementById('canvasContent');
+  content.innerHTML='';
+
+  // KPIs
+  const kpis = document.createElement('div'); kpis.className='kpis';
+  kpis.innerHTML = `
+    <div class="kpi"><div class="label">Risparmio stimato</div><div class="value">${estimateSaving()}%</div></div>
+    <div class="kpi"><div class="label">Riduzione gestione</div><div class="value">${estimateMgmt()}%</div></div>
+    <div class="kpi"><div class="label">Livello rischio</div><div class="value">${estimateRisk()}</div></div>
+  `;
+  content.appendChild(kpis);
+
+  // Predictive FAQs
+  const faqBlock = document.createElement('div');
+  faqBlock.innerHTML = `<div style="margin-top:10px" class="muted">Quello che probabilmente ti stai per chiedere</div>`;
+  const faqList = document.createElement('div'); faqList.style.marginTop='8px';
+  getPredictiveFaqs().forEach(it=>{
+    const f = document.createElement('div'); f.className='faq'; f.innerHTML = `<strong>${it.q}</strong><div style="margin-top:6px" class="muted">${it.a}</div>`;
+    faqList.appendChild(f);
+  });
+  faqBlock.appendChild(faqList);
+  content.appendChild(faqBlock);
+
+  // Errors
+  const err = document.createElement('div'); err.style.marginTop='10px';
+  err.innerHTML = `<div class="muted">Errori che vediamo spesso</div><div class="mini-case" style="margin-top:8px">${getErrors()}</div>`;
+  content.appendChild(err);
+
+  // Micro-simulation with numbers & quick chart
+  const simWrap = document.createElement('div'); simWrap.style.marginTop='12px';
+  const rent = simulateCost('rent'); const buy = simulateCost('buy');
+  simWrap.innerHTML = `<div class="muted">Micro-simulazione rapida (stima annua)</div>
+    <div style="display:flex;gap:12px;margin-top:8px">
+      <div class="kpi"><div class="label">Costo annuo (NLT)</div><div class="value">${formatCurrency(rent)} €</div></div>
+      <div class="kpi"><div class="label">Costo annuo (Acquisto)</div><div class="value">${formatCurrency(buy)} €</div></div>
+    </div>
+    <canvas id="miniChart" style="max-width:420px;height:140px;margin-top:10px"></canvas>
+  `;
+  content.appendChild(simWrap);
+
+  // Cases
+  renderCases();
+  renderSidebarFaqs();
+  document.getElementById('miniCase').innerText = getSectorMiniCase();
+
+  // create mini chart
+  setTimeout(()=>{ renderMiniChart(rent, buy); renderCompareChart(); }, 80);
+
+  // actions
+  document.getElementById('downloadJSON').onclick = ()=> downloadJSON(summary());
+  document.getElementById('shareLink').onclick = ()=> copyShareableLink();
+  document.getElementById('exportPNG').onclick = ()=> exportCanvasPNG();
+}
+
+function getErrors(){
+  if(state.profile==='pmi') return 'Budgettare il costo auto a consuntivo; ignorare il tempo perso in gestione; acquistare veicoli senza strategia.';
+  if(state.profile==='corporate') return 'Non pianificare la transizione verso l’elettrico; sottostimare la complessità fiscale.';
+  return 'Sottovalutare costi nascosti e gestione amministrativa.';
+}
+
+function getSectorMiniCase(){
+  if(state.profile==='pmi') return 'Esempio PMI: parco 5 veicoli, gestione centralizzata e risparmio 18–22%.';
+  if(state.profile==='freelancer') return 'Professionista: soluzione semplice, costi certi e deducibilità semplificata.';
+  if(state.profile==='company') return 'Azienda servizi: centralizzazione e KPI per ottimizzare utilizzo.';
+  if(state.profile==='corporate') return 'Corporate: piano di elettrificazione e riduzione TCO.';
+  return 'Esempio generico.';
+}
+
+function renderCases(){
+  const wrap = document.getElementById('casesList'); wrap.innerHTML='';
+  const templates = {
+    freelancer:['Auto ibrida per professionista con deducibilità parziale'],
+    pmi:['PMI logistica: NLT + telematica per ridurre il TCO','PMI commerciale: auto per agenti con gestione inclusa'],
+    company:['Azienda servizi: centralizzazione flotte e ottimizzazione KPI'],
+    corporate:['Corporate: elettrificazione e contratti dedicati per large-fleet']
+  };
+  (templates[state.profile]||['Esempio generico']).forEach(t=>{ const d=document.createElement('div'); d.className='mini-case'; d.innerText=t; wrap.appendChild(d); });
+}
+
+function renderSidebarFaqs(){
+  const list = document.getElementById('faqList'); list.innerHTML='';
+  getPredictiveFaqs().slice(0,4).forEach(it=>{
+    const f = document.createElement('div'); f.className='faq'; f.innerHTML = `<strong>${it.q}</strong><div style="margin-top:6px" class="muted">${it.a}</div>`;
+    list.appendChild(f);
+  });
+}
+
+// Charts
+let compareChart = null, miniChart = null;
+function renderCompareChart(){
+  const ctx = document.getElementById('compareChart').getContext('2d');
+  const rent = simulateCost('rent'), buy = simulateCost('buy');
+  const data = {labels:['Costo annuo'], datasets:[{label:'Acquisto',data:[buy],backgroundColor:'rgba(255,99,132,0.6)'},{label:'NLT',data:[rent],backgroundColor:'rgba(54,162,235,0.6)'}]};
+  if(compareChart) compareChart.destroy();
+  compareChart = new Chart(ctx,{type:'bar',data,options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
+}
+function renderMiniChart(rent,buy){
+  const ctx = document.getElementById('miniChart').getContext('2d');
+  const data = {labels:['Acquisto','NLT'],datasets:[{label:'Costo annuo',data:[buy,rent],backgroundColor:['rgba(255,99,132,0.6)','rgba(54,162,235,0.6)']}]}
+  if(miniChart) miniChart.destroy();
+  miniChart = new Chart(ctx,{type:'bar',data,options:{responsive:true,plugins:{legend:{display:false}}}});
+}
+
+// assistant behaviour (mock + integration placeholder)
+document.getElementById('assistantSend').addEventListener('click', assistantAsk);
+document.getElementById('assistantInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') assistantAsk(); });
+
+function assistantAsk(){
+  const q = document.getElementById('assistantInput').value.trim();
+  if(!q) return;
+  appendMessage(q,'user'); document.getElementById('assistantInput').value='';
+  // rule-based quick replies
+  setTimeout(()=>{
+    let r = 'Prova: "preventivo", "deducibilità", "km", "elettrico".';
+    const t = q.toLowerCase();
+    if(t.includes('prevent')) r = `Preventivo rapido: NLT: ${formatCurrency(simulateCost('rent'))} € / anno · Acquisto: ${formatCurrency(simulateCost('buy'))} € / anno.`;
+    if(t.includes('deduc')) r = 'Deducibilità: le spese di noleggio sono spesso deducibili come costi d’esercizio; verifica il tuo caso con il commercialista.';
+    if(t.includes('km')) r = 'Km: possiamo costruire piani con soglie diverse e tariffazioni km extra molto trasparenti.';
+    if(t.includes('elettr')) r = 'Elettrico: valutiamo autonomia, infrastruttura di ricarica e incentivi. Posso preparare un prospetto.';
+    appendMessage(r,'ai');
+  },600);
+}
+
+function appendMessage(text, who){
+  const b = document.getElementById('assistantBody');
+  const m = document.createElement('div'); m.className='msg '+(who==='user'?'user':'ai'); m.innerText = text; b.appendChild(m); b.scrollTop = b.scrollHeight;
+}
+
+// shareable link generation (encodes choices in URL)
+function copyShareableLink(){
+  const base = location.href.split('#')[0].split('?')[0];
+  const params = new URLSearchParams({p:state.profile, pr:state.priority, s:state.size, id:state.id});
+  const link = base + '?' + params.toString();
+  navigator.clipboard.writeText(link).then(()=> alert('Link copiato negli appunti. Incollalo per condividere il test.'));
+}
+
+// init from URL if present
+function initFromUrl(){
+  const params = new URLSearchParams(location.search);
+  const p = params.get('p'), pr = params.get('pr'), s = params.get('s');
+  if(p && pr && s){ // select matching options visually
+    // find corresponding buttons and trigger click
+    document.querySelectorAll('#profileOptions .option').forEach(b=>{ if(b.dataset.value===p){ b.click(); } });
+    document.querySelectorAll('#priorityOptions .option').forEach(b=>{ if(b.dataset.value===pr){ b.click(); } });
+    document.querySelectorAll('#sizeOptions .option').forEach(b=>{ if(b.dataset.value===s){ b.click(); } });
+    // auto-generate canvas
+    setTimeout(()=> generateCanvas(), 300);
+  }
+}
+
+// export canvas as PNG (simple implementation: capture main container)
+function exportCanvasPNG(){
+  // use html2canvas if available, otherwise fallback to print
+  if(typeof html2canvas === 'function'){
+    html2canvas(document.querySelector('.wrap')).then(canvas => {
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a'); a.href = url; a.download = 'mobility_canvas.png'; a.click();
+    });
+  } else {
+    alert('Per esportare come PNG puoi aggiungere html2canvas.js alla pagina. Nel frattempo puoi fare uno screenshot.');
+  }
+}
+
+// JSON export
+function summary(){ return {id: state.id, timestamp: state.timestamp, profile: state.profile, priority: state.priority, size: state.size, estimates:{saving:estimateSaving(),management:estimateMgmt(),risk:estimateRisk()}, simulation:{rent:simulateCost('rent'),buy:simulateCost('buy')} }; }
+function downloadJSON(obj){
+  const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj,null,2));
+  const a = document.createElement('a'); a.href = data; a.download = 'mobility_summary.json'; a.click();
+}
+
+// mini simulation buttons
+document.getElementById('simBuy').addEventListener('click', ()=> { document.getElementById('simResult').innerHTML = `<div class="muted">Acquisto — Costi annui stimati: <strong>${formatCurrency(simulateCost('buy'))} €</strong>. Rischio svalutazione.</div>`; });
+document.getElementById('simRent').addEventListener('click', ()=> { document.getElementById('simResult').innerHTML = `<div class="muted">NLT — Costi annui stimati: <strong>${formatCurrency(simulateCost('rent'))} €</strong>. Tutto incluso.</div>`; });
+
+// utilities
+function formatCurrency(n){ return n.toLocaleString('it-IT'); }
+
+// UI handlers
+document.getElementById('generate').addEventListener('click', generateCanvas);
+document.getElementById('reset').addEventListener('click', ()=> location.reload());
+document.getElementById('editChoices').addEventListener('click', ()=> { document.getElementById('checkin').style.display='block'; document.getElementById('canvasSection').style.display='none'; document.getElementById('scenarios').style.display='none'; document.getElementById('cases').style.display='none'; });
+document.getElementById('demoTour').addEventListener('click', demoTour);
+document.getElementById('openAll').addEventListener('click', ()=> alert('In versione completa si aprirebbe l’elenco esteso di FAQ con filtri.'));
+
+document.getElementById('downloadJSON').addEventListener('click', ()=> downloadJSON(summary()));
+
+// small guided tour
+function demoTour(){
+  alert('Tour rapido: 1) Seleziona tipo azienda, priorità, numero veicoli. 2) Clicca "Genera". 3) Visualizza KPI, FAQ e micro-simulazioni. 4) Copia link per condividerlo.');
+}
+
+// copy contact behaviour
+document.getElementById('contact').addEventListener('click', ()=> { navigator.clipboard.writeText('sales@tuosito.it'); alert('Email commerciale copiata: sales@tuosito.it'); });
+
+// on load
+mountOptions();
+initFromUrl();
+
+// Optional: placeholder for real AI integration (instructions)
+// To integrate a real AI assistant, replace assistantAsk's reply-generation logic with a call to your backend endpoint:
+// fetch('/api/assistant', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({query:q, profile: state}) })
+// .then(r=>r.json()).then(data=> appendMessage(data.reply,'ai'));
+
+// Optional: add html2canvas for PNG export (uncomment CDN below if you want to enable export)
+// var s = document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'; document.head.appendChild(s);
+
+</script>
+</body>
+</html>
